@@ -1,0 +1,121 @@
+{{- if include "owncloud.host" . -}}
+apiVersion: {{ template "owncloud.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "owncloud.fullname" . }}
+  labels:
+    app: {{ template "owncloud.fullname" . }}
+    chart: {{ template "owncloud.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "owncloud.fullname" . }}
+      release: "{{ .Release.Name }}"
+  replicas: {{ .Values.replicas }}
+{{- if .Values.updateStrategy }}
+  strategy: {{ toYaml .Values.updateStrategy | nindent 4 }}
+{{- end }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "owncloud.fullname" . }}
+        chart: {{ template "owncloud.chart" . }}
+        release: "{{ .Release.Name }}"
+    spec:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "status.localhost"
+      containers:
+      - name: {{ template "owncloud.fullname" . }}
+        image: {{ template "owncloud.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        env:
+        - name: ALLOW_EMPTY_PASSWORD
+          value: {{ .Values.allowEmptyPassword | quote }}
+        - name: OWNCLOUD_DB_NAME
+          value: {{ .Values.externalDatabase.database | quote }}
+        - name: OWNCLOUD_DB_TYPE
+          value: {{ .Values.externalDatabase.type | quote }}
+        - name: OWNCLOUD_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "owncloud.fullname" . }}
+              key: admin-password
+        - name: OWNCLOUD_ADMIN_USERNAME
+          value: {{ .Values.externalDatabase.admin | quote }}
+        - name: OWNCLOUD_DB_HOST
+          value: {{ .Values.externalDatabase.host | quote }}
+        - name: MARIADB_PORT_NUMBER
+          value: {{ .Values.externalDatabase.port | quote }}
+        - name: OWNCLOUD_DB_USERNAME
+          value: {{ .Values.externalDatabase.user | quote }}
+        - name: OWNCLOUD_REDIS_ENABLED
+          value: {{ .Values.redis.enabled | quote }}
+        - name: OWNCLOUD_REDIS_HOST
+          value: {{ .Values.redis.host | quote }}
+        - name: OWNCLOUD_DATABASE_USER
+          value: {{ .Values.externalDatabase.user | quote }}
+        - name: OWNCLOUD_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ printf "%s-%s" .Release.Name "externaldb" }}
+              key: db-password
+{{- $port:=.Values.service.port | toString }}
+        - name: OWNCLOUD_HOST
+          value: "{{ include "owncloud.host" . }}{{- if ne $port "80" }}:{{ .Values.service.port }}{{ end }}"
+        - name: OWNCLOUD_USERNAME
+          value: {{ default "" .Values.owncloudUsername | quote }}
+        - name: OWNCLOUD_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "owncloud.fullname" . }}
+              key: owncloud-password
+        - name: OWNCLOUD_EMAIL
+          value: {{ default "" .Values.owncloudEmail | quote }}
+        {{- if .Values.extraEnvVars }}
+        {{- include "owncloud.tplValues.render" ( dict "value" .Values.extraEnvVars "context" $ ) | nindent 8 }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /status.php
+            port: http
+            httpHeaders:
+            - name: Host
+              value: {{ include "owncloud.host" . | quote }}
+          initialDelaySeconds: 500
+          timeoutSeconds: 20
+          failureThreshold: 6
+        readinessProbe:
+          httpGet:
+            path: /status.php
+            port: http
+            httpHeaders:
+            - name: Host
+              value: {{ include "owncloud.host" . | quote }}
+          initialDelaySeconds: 500
+          timeoutSeconds: 20
+          periodSeconds: 5
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        volumeMounts:
+        - name: owncloud-data
+          mountPath: /mnt/data
+      volumes:
+      - name: owncloud-data
+      {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ if .Values.persistence.owncloud.existingClaim }}{{ .Values.persistence.owncloud.existingClaim }}{{- else }}{{ template "owncloud.fullname" . }}-owncloud{{- end }}
+      {{- else }}
+        emptyDir: {}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+{{- end -}}

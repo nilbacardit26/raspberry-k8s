@@ -1,0 +1,15 @@
+controller:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - k8s-node-1
+  service:
+    type: NodePort
+    nodePorts:
+      http: "31153"
+      https: "30833"

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: owncloudpvc
+  namespace: owncloud
+spec:
+  storageClassName: "local-path"
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 800Gi
+  volumeName: "owncloudpv"

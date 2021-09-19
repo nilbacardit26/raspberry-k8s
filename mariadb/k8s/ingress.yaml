@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: tutorial
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+  name: getting-started
+spec:
+  rules:
+    - host: gettingstarted.elracodelfrare.cat
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: getting-started
+              servicePort: 3000
+  tls:
+    - hosts:
+      - gettingstarted.elracodelfrare.cat
+      secretName: gettingstarted-elracodelfrare-cat

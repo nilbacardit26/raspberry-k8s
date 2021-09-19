@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 20000m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "2400"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "2400"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "2400"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "2400"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: "5"
+  name: ingress
+  namespace: owncloud
+spec:
+  rules:
+  - host: owncloud.elracodelfrare.cat
+    http:
+      paths:
+      - backend:
+          serviceName: owncloud
+          servicePort: 8080
+        path: /
+  tls:
+  - hosts:
+    - owncloud.elracodelfrare.cat
+    secretName: owncloud-elracodelfrare-prod-tls
