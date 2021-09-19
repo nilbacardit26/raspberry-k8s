@@ -1,0 +1,51 @@
+volumePermissions:
+  image:
+    repository: arm32v7/debian
+    tag: stretch
+usePassword: false
+image:
+  repository: arm32v7/redis
+  tag: latest
+master:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: k3s.io/hostname
+            operator: NotIn
+            values:
+            - k8s-master
+  command: redis-server
+  resources:
+    requests:
+       memory: 512Mi
+       cpu: 200m
+  persistence:
+    size: 5Gi
+slave:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: k3s.io/hostname
+            operator: NotIn
+            values:
+            - k8s-master
+  resources:
+    requests:
+       memory: 256Mi
+       cpu: 100m
+  readinessProbe:
+    enabled: false
+  livenessProbe:
+    enabled: false
+  command: redis-server
+  persistence:
+    size: 3Gi
+persistence:
+  storageClass: nfs-client
+cluster:
+  enabled: false
+  slaveCount: 1
