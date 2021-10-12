@@ -62,7 +62,7 @@ redis-purge:
 	helm delete redis -n owncloud
 
 owncloud-deploy:
-	helm upgrade --install --wait --timeout 1200s --kube-context $(context) --install owncloud ./owncloud -n owncloud
+	helm upgrade --install --wait --timeout 1900s --kube-context $(context) --install owncloud ./owncloud -n owncloud
 
 owncloud-debug:
 	helm upgrade --wait --kube-context $(context) --install owncloud ./owncloud -n owncloud --dry-run --debug
@@ -90,3 +90,26 @@ collabora-purge:
 
 mariadb:
 	helm upgrade --wait --kube-context $(context) --install --values ./owncloud/mariadb/values.yaml mariadb bitnami/mariadb -n owncloud
+
+redis-bitnami-deploy:
+	helm install --kube-context $(context) redis bitnami/redis --values redis-bitnami/values.yaml -n owncloud
+
+purge-redis-bitnami:
+	helm delete --kube-context $(context) redis -n owncloud
+
+postgresql-deploy:
+	helm install postgresql bitnami/postgresql -n owncloud --values postgresql-bitnami/values.yaml
+
+purge-postgresql:
+	helm delete postgresql -n owncloud
+
+mysql-bitnami-deploy:
+	helm upgrade --install mysql bitnami/mysql --values mysql-bitnami/values.yaml -n owncloud
+purge-mysql:
+	helm delete mysql -n owncloud
+
+mariadb-bitnami-deployment:
+	helm install mariadb bitnami/mariadb -n owncloud --values mariadb-bitnami/values.yaml
+
+mariadb-purge:
+	helm delete mariadb -n owncloud

@@ -4,7 +4,7 @@ replicas: 3
 image:
   registry: docker.io
   repository: owncloud/server
-  tag: 10.8.0-arm32v7
+  tag: 10.8.0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -105,6 +105,7 @@ allowEmptyPassword: "yes"
 ##
 externalDatabase:
   ## Database host
+
   type: mysql
 
   host: mariadb
@@ -207,10 +208,18 @@ affinity:
             operator: NotIn
             values:
             - k8s-master
-            - asus-pn51
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - asus-pn51
+
   podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
+        - weight: 95
           podAffinityTerm:
             labelSelector:
               matchExpressions:

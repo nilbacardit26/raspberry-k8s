@@ -57,6 +57,8 @@ spec:
                 secretKeyRef:
                   name: mariadbsecrets
                   key: mysql-password
+      nodeSelector:
+        kubernetes.io/hostname: k8s-node-3
       volumes:
         - name: storage
           persistentVolumeClaim:
