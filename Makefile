@@ -113,3 +113,6 @@ mariadb-bitnami-deployment:
 
 mariadb-purge:
 	helm delete mariadb -n owncloud
+
+mariadb-raspi:
+	kubectl --kube-context $(context) apply -f ./mariadb/k8s/statefulset.yaml -n owncloud

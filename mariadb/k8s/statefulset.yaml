@@ -24,9 +24,8 @@ spec:
             nodeSelectorTerms:
             - matchExpressions:
               - key: kubernetes.io/hostname
-                operator: NotIn
+                operator: In
                 values:
-                  - k8s-master
                   - asus-pn51
       securityContext:
         runAsUser: 1001
@@ -35,7 +34,8 @@ spec:
       securityContext:
       containers:
         - name: mariadb
-          image: hypriot/rpi-mysql:latest
+          # arm-> image: hypriot/rpi-mysql:latest 
+          image: mariadb:10.5.12
           ports:
             - containerPort: 3306
               name: db-port
@@ -57,8 +57,6 @@ spec:
                 secretKeyRef:
                   name: mariadbsecrets
                   key: mysql-password
-      nodeSelector:
-        kubernetes.io/hostname: k8s-node-3
       volumes:
         - name: storage
           persistentVolumeClaim:

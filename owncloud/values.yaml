@@ -1,6 +1,6 @@
 ## Global Docker image parameters
 
-replicas: 3
+replicas: 8
 image:
   registry: docker.io
   repository: owncloud/server
@@ -189,7 +189,7 @@ updateStrategy:
 resources:
   requests:
     memory: 900Mi
-    cpu: 0.7
+    cpu: 0.3
 
 ## Pod annotations
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
@@ -219,7 +219,7 @@ affinity:
 
   podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 95
+        - weight: 75
           podAffinityTerm:
             labelSelector:
               matchExpressions:
