@@ -1,6 +1,6 @@
 ## Global Docker image parameters
 
-replicas: 6
+replicas: 3
 image:
   registry: docker.io
   repository: owncloud/server
@@ -89,7 +89,7 @@ owncloudUsername: nil
 ## Defaults to a random 10-character alphanumeric string if not set
 ## ref: https://github.com/bitnami/bitnami-docker-owncloud#configuration
 ##
-owncloudPassword: ""
+owncloudPassword: "nil26049242"
 
 ## Admin email
 ## ref: https://github.com/bitnami/bitnami-docker-owncloud#configuration
@@ -106,7 +106,7 @@ allowEmptyPassword: "yes"
 externalDatabase:
   ## Database host
   type: mysql
-  
+
   host: mariadb
   
   admin: "nil"
@@ -118,7 +118,7 @@ externalDatabase:
 
   ## Database password if null randomly generated
   # ENter the password of the db here
-  password: ""
+  password: "nil26049242"
 
   ## Database name
   database: database
@@ -188,7 +188,7 @@ updateStrategy:
 resources:
   requests:
     memory: 900Mi
-    cpu: 0.6
+    cpu: 0.7
 
 ## Pod annotations
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
@@ -203,10 +203,11 @@ affinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          - key: k3s.io/hostname
+          - key: kubernetes.io/hostname
             operator: NotIn
             values:
             - k8s-master
+            - asus-pn51
   podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 100

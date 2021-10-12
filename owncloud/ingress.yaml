@@ -21,7 +21,17 @@ spec:
           serviceName: owncloud
           servicePort: 8080
         path: /
+  - host: collabora.elracodelfrare.cat
+    http:
+      paths:
+      - backend:
+          serviceName: collabora-online
+          servicePort: 9980
+        path: /
   tls:
   - hosts:
     - owncloud.elracodelfrare.cat
     secretName: owncloud-elracodelfrare-prod-tls
+  - hosts:
+    - collabora.elracodelfrare.cat
+    secretName: collabora-elracodelfrare-prod-tls

@@ -1,0 +1,96 @@
+# Default values for collabora-online.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  app:
+    name: collabora-online
+    urlScheme: HTTP # either HTTP or HTTPS
+    scaling:
+      enabled: false
+      min: 1
+      max: 10
+      target:
+        cpu: 70
+        memory: 70
+    monitoring:
+      activate: false
+      port: 9980
+      path: "/lool/getMetrics"
+    service:
+      name: collabora-online
+      type: ClusterIP
+      externalPort: 9980
+      internalPort: 9980
+  ingress:
+    name: collabora-online
+
+replicaCount: 2 # This is the amount of how many instances of loolwsd will run
+
+image:
+  pullPolicy: Always
+  repository: collabora/code
+  tag: 6.4.11.3
+
+probes:
+  urlScheme: HTTP # either HTTP or HTTPS
+  port: 9980
+  readiness:
+    activate: true
+    path: /
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 30
+    successThreshold: 1
+    failureThreshold: 3
+  liveness:
+    activate: true
+    path: /
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 30
+    successThreshold: 1
+    failureThreshold: 3
+
+deployment:
+  name: collabora-online
+  type: RollingUpdate
+  minReadySeconds: 0
+  maxUnavailable: 1
+  maxSurge: 1
+
+environmentVariablesLool:
+  - name: extra_params
+    value: --o:ssl.termination=true --o:ssl.enable=false
+  - name: username
+    value: nil
+  - name: password
+    value: nil26049242
+  - name: server_name
+    value: collabora\.elracodelfrare\.cat
+  - name: domain
+    value: owncloud\\.elracodelfrare\\.cat
+  - name: DONT_GEN_SSL_CERT
+    value: "true"
+  - name: dictionaries
+    value: "de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT ru ca"
+    
+
+service:
+  name: collabora-online
+
+hpa:
+  name: collabora-online
+
+namespace:
+  collabora: owncloud
+
+resources:
+  limits:
+   cpu: 1
+   memory: 5Gi
+  requests:
+   cpu: 600m
+   memory: 3Gi
+
+nodeSelector:
+  kubernetes.io/arch: amd64

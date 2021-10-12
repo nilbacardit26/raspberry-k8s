@@ -12,10 +12,10 @@ master:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          - key: k3s.io/hostname
-            operator: NotIn
+          - key: kubernetes.io/hostname
+            operator: In
             values:
-            - k8s-master
+              - k8s-node-3
   command: redis-server
   resources:
     requests:
@@ -29,10 +29,10 @@ slave:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          - key: k3s.io/hostname
-            operator: NotIn
+          - key: kubernetes.io/hostname
+            operator: In
             values:
-            - k8s-master
+              - k8s-node-3
   resources:
     requests:
        memory: 256Mi
@@ -48,4 +48,4 @@ persistence:
   storageClass: nfs-client
 cluster:
   enabled: false
-  slaveCount: 1
+  slaveCount: 0

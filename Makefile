@@ -18,6 +18,9 @@ cert-manager-deploy:
 nfs-provisioner-upgrade:
 	helm upgrade --install nfs-client nfs-subdir-external-provisioner/nfs-subdir-external-provisioner --wait --values nfs-provisioner/values.yaml
 
+nfs-purge:
+	helm delete nfs-client
+
 prometheus-deployment:
 	helm install --wait --kube-context $(context) prometheus prometheus-community/prometheus --values ./prometheus/values.yaml -n prometheus
 	kubectl apply -f prometheus/server/pv.yaml
@@ -55,6 +58,9 @@ grafana-purge:
 redis-upgrade:
 	helm upgrade --wait --kube-context $(context) --timeout=200s --install --values ./redis/redis_values.yaml redis stable/redis -n owncloud
 
+redis-purge:
+	helm delete redis -n owncloud
+
 owncloud-deploy:
 	helm upgrade --install --wait --timeout 1200s --kube-context $(context) --install owncloud ./owncloud -n owncloud
 
@@ -65,4 +71,22 @@ purge-owncloud:
 	helm delete --kube-context $(context) owncloud -n owncloud
 
 owncloud-recreate:
-	helm upgrade --wait --recreate-pods --kube-context $(context) --install owncloud ./owncloud -n owncloud
+	helm upgrade --wait --kube-context $(context) --install owncloud ./owncloud -n owncloud
+
+collabora-code-upgrade:
+	helm upgrade --install --kube-context $(context) collabora ./collabora-code -n owncloud --values collabora-code/values.yaml
+
+collabora-debug:
+	helm upgrade --install --kube-context $(context) collabora ./collabora-code -n owncloud --values collabora-code/values.yaml --dry-run --debug
+
+metallb-deploy:
+	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
+	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
+metallb-purge:
+	helm delete --kube-context $(context) metallb
+
+collabora-purge:
+	helm delete --kube-context $(context) collabora -n owncloud
+
+mariadb:
+	helm upgrade --wait --kube-context $(context) --install --values ./owncloud/mariadb/values.yaml mariadb bitnami/mariadb -n owncloud

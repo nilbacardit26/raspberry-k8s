@@ -88,7 +88,7 @@ spec:
             httpHeaders:
             - name: Host
               value: {{ include "owncloud.host" . | quote }}
-          initialDelaySeconds: 500
+          initialDelaySeconds: 120
           timeoutSeconds: 20
           failureThreshold: 6
         readinessProbe:
@@ -98,7 +98,7 @@ spec:
             httpHeaders:
             - name: Host
               value: {{ include "owncloud.host" . | quote }}
-          initialDelaySeconds: 500
+          initialDelaySeconds: 120
           timeoutSeconds: 20
           periodSeconds: 5
         resources:
